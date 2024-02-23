@@ -1,0 +1,18 @@
+{
+  "fortiLabEnv": "Azure",
+  "fortiLabName": "SDWAN",
+  "fortiRestricted": "1",
+  "labDuration": "4",
+  "userIdNumberRange": "10:40",
+  "userNamePrefix": "se",
+  "userTenantDomain": "tenant-01",
+  "userResourceGroups": [
+    {
+      "suffix": "workshop-sdwan",
+      "location": "eastus",
+      "storage": true,
+      "sharename": "cloudshellshare",
+      "bastion": false
+    }
+  ]
+}

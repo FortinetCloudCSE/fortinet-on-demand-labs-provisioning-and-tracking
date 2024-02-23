@@ -45,11 +45,22 @@ Labs can be one of two types
 
 ### Azure Provisioned Environments
 
+Azure Provisioned Environments are defined in a JSON structured file containing attributes whose values are used to manage user accounts and resources. Lab definition files are stored in the above described Azure Storage Account.
+
+The Azure Runbook ManageTrainingUser.ps1, retrieves the requested lab definition file from the Storage Account and processes the request based on the attributes in the lab definition file.
+
+> Azure and non-Azure lab environments will always create a Lab utilization record in the above described Azure Storage Table. For a non-Azure environment after the utilization record is created no other actions are performed.
+
 #### Azure Lab Definition Attributes
 
-Lab provisioning and utilization tracking is done via na Azure Runbook. Lab definition attributes must minimally indicate provider environment and Lab Name. In the case of an Azure specified as the provider additional attributes are required to define the resources to be provisioned for the lab. The two attributes fortiLabEnv and fortiLabName are used to creating a Lab utilization record in the Storage Table described in the Azure Components.
+Lab provisioning and utilization tracking is done via an Azure Runbook adn Azure Storage Table. Lab definition attributes must minimally indicate Provider Environment and Lab Name. Two attributes fortiLabEnv and fortiLabName are used to create a Lab utilization record in the Storage Table described in the Azure Components. When Azure is specified as the provider, additional attributes are required to define the resources to be provisioned for the lab.
 
-An Azure Environment can be restricted to one or more email domains to limit who can provision a lab.
+Azure lab definition attributes describe the lab name, number of allowed users, username prefix, Azure Tenant where lab is provisioned, length of lab, and all lab required lab resources.
+
+The lab definition shown below describes a lab environment that can be provisioned for up to 30 users. Usernames are a combination of the next available number in the Id Range and the username prefix. Usernames fortilab21 - fortilab50 would be available for provisioning. The username combined with the Tenant Domain provide a login account for Azure. The Azure login account is temporary and will be removed when teh lab duration has been reached.
+
+A lab request from a user in an allowed domain will receive an email with their Azure login credentials. The Azure login account will only have access to the Resource Group(s) described in the lab definition. User provisioning the same lab will not have access to other user's environments, unless an Administrator providers a user access to interact with other environments.
+
 
 | Attribute | Value | Description | |
 |---|---|---|---|
@@ -108,9 +119,17 @@ An Azure Environment can be restricted to one or more email domains to limit who
 
 ### All Other Environments
 
+These two attributes fortiLabEnv and fortiLabName are used to create a Lab utilization record in the Storage Table described in the Azure Components. However, any user and or user environment provisioning is managed by another process.
+
 ```json
 {
   "fortiLabEnv": "AWS",
   "fortiLabName": "AWSFGTCNF"
 }
 ```
+
+## Lab Utilization Tracking
+
+An Azure Storage Table is utilized to track lab requests. Each lab requests for any environment creates a record as described earlier in this document.
+
+An Azure lab can be provisioned by the same user multiple times, each time a request is received, lab availability is determined. If an available user in the Id Range is found, a lab will be provisioned.  This ability allows an instructor to pre provision lab environments.

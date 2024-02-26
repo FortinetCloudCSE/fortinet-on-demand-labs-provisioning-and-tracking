@@ -61,28 +61,27 @@ The lab definition shown below describes a lab environment that can be provision
 
 A lab request from a user in an allowed domain will receive an email with their Azure login credentials. The Azure login account will only have access to the Resource Group(s) described in the lab definition. User provisioning the same lab will not have access to other user's environments, unless an Administrator providers a user access to interact with other environments.
 
-
-| Attribute | Value | Description | |
-|---|---|---|---|
-| fortiLabEnv           | Azure                                                    | Provider Environment                                              ||
-| fortiLabName          | FORTILAB                                                 | Lab Name, Must be Unique                                          ||
-| fortiRestricted       | ["fortinet.com", "fortinet-us.com", "concourselabs.com"] | List Email Domains Lab is Restricted to, empty means all allowed  ||
-| userIdNumberRange     | 21:50                                                    | Lab User ID Range - is combined with userNamePrefix               ||
-| userNamePrefix        | fortilab                                                 | Lab User ID Prefix - with range 21:50, fortilab21 - fortilab50    ||
-| userTenantDomain      | tenant-01                                                | Key mapped to deployment Tenant in Azure Vault                    ||
-| labDuration           | 6                                                        | Number of lab duration days, when passed lab is deleted           ||
-| userResourceGroups    | List of Resource Group definition Attributes             | List of Resource Groups and resources to provision                ||
-| - suffix              | workshop-fortilab                                        | Combined with username to create Resource Group name              ||
-| - location            | eastus                                                   | Azure Region                                                      ||
-| - storage             | true                                                     | Create Storage Account in Resource Group                          ||
-| - sharename           | cloudshellshare                                          | Name of File share to create in Storage Account                   ||
-| - bastion             | true or false                                            | Create Bastion Host in Resource Group                             ||
-| - utilityVnetName     | vnet-utility                                             | Azure Virtual Network Name                                        ||
-| - utilityVnetCIDR     | 192.168.100.0/24                                         | Azure Virtual Network Address Space                               ||
-| - utilitySubnetName   | utility                                                  | Azure Virtual Network Subnet Name                                 ||
-| - utilitySubnetPrefix | 192.168.100.64/26                                        | Azure Virtual Network Subnet Address Space                        ||
-| - bastionSubnetName   | AzureBastionSubnet                                       | Azure Virtual Network Bastion Subnet - must be AzureBastionSubnet ||
-| - bastionSubnetPrefix | 192.168.100.0/26                                         | Azure Virtual Network Bastion Subnet Address Space                ||
+| Attribute | Value | Description |
+|---|---|---|
+| fortiLabEnv           | Azure                                                    | Provider Environment                                              |
+| fortiLabName          | FORTILAB                                                 | Lab Name, Must be Unique                                          |
+| fortiRestricted       | ["fortinet.com", "fortinet-us.com", "concourselabs.com"] | List Email Domains Lab is Restricted to, empty means all allowed  |
+| userIdNumberRange     | 21:50                                                    | Lab User ID Range - is combined with userNamePrefix               |
+| userNamePrefix        | fortilab                                                 | Lab User ID Prefix - with range 21:50, fortilab21 - fortilab50    |
+| userTenantDomain      | tenant-01                                                | Key mapped to deployment Tenant in Azure Vault                    |
+| labDuration           | 6                                                        | Number of lab duration days, when passed lab is deleted           |
+| userResourceGroups    | List of Resource Group definition Attributes             | List of Resource Groups and resources to provision                |
+| - suffix              | workshop-fortilab                                        | Combined with username to create Resource Group name              |
+| - location            | eastus                                                   | Azure Region                                                      |
+| - storage             | true                                                     | Create Storage Account in Resource Group                          |
+| - sharename           | cloudshellshare                                          | Name of File share to create in Storage Account                   |
+| - bastion             | true or false                                            | Create Bastion Host in Resource Group                             |
+| - utilityVnetName     | vnet-utility                                             | Azure Virtual Network Name                                        |
+| - utilityVnetCIDR     | 192.168.100.0/24                                         | Azure Virtual Network Address Space                               |
+| - utilitySubnetName   | utility                                                  | Azure Virtual Network Subnet Name                                 |
+| - utilitySubnetPrefix | 192.168.100.64/26                                        | Azure Virtual Network Subnet Address Space                        |
+| - bastionSubnetName   | AzureBastionSubnet                                       | Azure Virtual Network Bastion Subnet - must be AzureBastionSubnet |
+| - bastionSubnetPrefix | 192.168.100.0/26                                         | Azure Virtual Network Bastion Subnet Address Space                |
 
 ```json
 {
@@ -130,6 +129,8 @@ These two attributes fortiLabEnv and fortiLabName are used to create a Lab utili
 
 ## Lab Utilization Tracking
 
-An Azure Storage Table is utilized to track lab requests. Each lab requests for any environment creates a record as described earlier in this document.
+An Azure Storage Table is utilized to track lab requests. Each lab request for any environment creates a record as described earlier in this document.
 
-An Azure lab can be provisioned by the same user multiple times, each time a request is received, lab availability is determined. If an available user in the Id Range is found, a lab will be provisioned.  This ability allows an instructor to pre provision lab environments.
+An Azure lab can be provisioned by the same user multiple times, each time a request is received, lab availability is determined. If an available user in the Id Range is found, a lab will be provisioned.  This ability allows an instructor to pre provision lab environments or a single user to run the lab more than once at the same time.
+
+![Lab Tracking](images/Lab-Tracking.jpg)

@@ -145,13 +145,23 @@ Standardizing on Hugo's standard directory structure allows for lab documentatio
 
 Using Hugo's ***layouts/shortcodes*** directory, lab documentation can incorporate various aspects of websites that may require a specialized handling outside the scope of Hugo supported capabilities.
 
-The ***layouts/shortcodes*** directory ofr lab documentation is used to store a html script and form code to call to the Lab Provisioning and Enrollment as part of the lab utilization process. The code is structured to be as generic as possible requiring minimal changes for each lab's documentation. The file *launchdemoform.html* in ***layouts/shortcodes*** only requires that the value of var labdefinition be set to the name of the lab definition file in the Azure Storage account.
+The ***layouts/shortcodes*** directory ofr lab documentation is used to store a html script and form code to call to the Lab Provisioning and Enrollment as part of the lab utilization process. The code is structured to be as generic as possible requiring minimal changes for each lab's documentation. The file *launchdemoform.html* in ***layouts/shortcodes*** only requires that the value of ```var labdefinition``` be set to the basename of the lab definition file in the Azure Storage account.
+
+To pass the basename of the lab definition file in Hugo, when referencing the *launchdemoform.html* set the value of the **labdefinition** parameter. The code in *launchdemoform.html* uses the Hugo **.Get** operator to set the variable to the passed parameter value.
+
+### Adding launchdemoform.html to Lab Documentation
+
+***launchdemoform.html*** can inserted into any Hugo Markdown document as shown below
+
+```html
+{{< launchdemoform labdefintion="azure-fgt-autostitch">}}
+```
 
 ```html
 <script>
   function formSubmit() {
 
-    var labdefinition = "fgtauto-lab";
+    var labdefinition = "{{ .Get `labdefinition` }}";
 
     var customer = document.getElementById("customer").value;
     var smartticket = document.getElementById("smartticket").value;
@@ -195,16 +205,7 @@ The ***layouts/shortcodes*** directory ofr lab documentation is used to store a 
 </form>
 ```
 
-### Adding launchdemoform.html to Lab Documentation
-
-launchdemoform.html can inserted into any Hugo Markdown document as shown below
-
-```html
-Provision Azure Environment, minimally enter your Email address and click _Provision_
-{{< launchdemoform >}}
-```
-
-Contents of launchdemoform.html will be inserted into the html page when the Hugo process renders the page.
+Contents of ***launchdemoform.html*** will be inserted into the html page when the Hugo process renders the page.
 
 ## Resulting Document
 

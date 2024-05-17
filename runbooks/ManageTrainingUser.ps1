@@ -4,7 +4,7 @@
 
     .NOTES
         AUTHOR: jmcdonough@fortinet.com
-        LASTEDIT: Feb 23, 2024
+        LASTEDIT: May 17 24, 2024
 #>
 
 # Can be run via WebHook or from Cmd line.
@@ -167,49 +167,49 @@ function New-ResourceGroupUserRoleAssignments {
 	return $userResourceGroupRoleAssignment
 }
 
-function Update-StorageTable{
-  param(
-      [Parameter(Mandatory=$true)]
-      [String] $inputResourceGroupName,
-      [Parameter(Mandatory=$true)]
-      [String] $inputStorageAccountName,
-      [Parameter(Mandatory=$true)]
-      [String] $inputLabName,
-      [Parameter(Mandatory=$true)]
-      [array] $inputUserEmail,
-      [Parameter(Mandatory=$true)]
-      [array] $inputLabUserId,
-      [Parameter(Mandatory=$true)]
-      [array] $inputCustomer,
-      [Parameter(Mandatory=$true)]
-      [array] $inputSmartTicket,
-      [Parameter(Mandatory=$true)]
-      [array] $inputLabEnvironment
-  )
+function Update-StorageTable {
+	param(
+		[Parameter(Mandatory = $true)]
+		[String] $inputResourceGroupName,
+		[Parameter(Mandatory = $true)]
+		[String] $inputStorageAccountName,
+		[Parameter(Mandatory = $true)]
+		[String] $inputLabName,
+		[Parameter(Mandatory = $true)]
+		[array] $inputUserEmail,
+		[Parameter(Mandatory = $true)]
+		[array] $inputLabUserId,
+		[Parameter(Mandatory = $true)]
+		[array] $inputCustomer,
+		[Parameter(Mandatory = $true)]
+		[array] $inputSmartTicket,
+		[Parameter(Mandatory = $true)]
+		[array] $inputLabEnvironment
+	)
 
-  $storageAccount = Get-AzStorageAccount -ResourceGroupName $inputResourceGroupName -Name $inputStorageAccountName
-  $storageTable = Get-AzStorageTable –Name "workshops" –Context $storageAccount.Context
+	$storageAccount = Get-AzStorageAccount -ResourceGroupName $inputResourceGroupName -Name $inputStorageAccountName
+	$storageTable = Get-AzStorageTable –Name "workshops" –Context $storageAccount.Context
 
-  $workshopRecords = Get-AzTableRow -table $storageTable.CloudTable | Where-Object {$_.RowKey.StartsWith($inputLabName)}
+	$workshopRecords = Get-AzTableRow -table $storageTable.CloudTable | Where-Object { $_.RowKey.StartsWith($inputLabName) }
 
-  if ($workshopRecords.Count -eq 0) {
-      Write-Output "No $($inputLabName) records found"
-      $nextinstance = 1
-  }
-  else {
-      $instances = @()
-  
-      foreach ($workshopRecord in $workshopRecords) {
-          $instance = [int]$workshopRecord.RowKey.Split("-")[1]
-          $instances += $instance 
-      }
-      $sortedInstances = $instances | Sort-Object
-      $nextInstance = $sortedInstances[$sortedInstances.Count-1] + 1
-  }
-  $nextInstance
+	if ($workshopRecords.Count -eq 0) {
+		Write-Output "No $($inputLabName) records found"
+		$nextinstance = 1
+	}
+	else {
+		$instances = @()
 
-  Add-AzTableRow -table $storageTable.CloudTable -partitionKey "workshops" -rowKey ($inputLabName+"-"+$nextInstance) `
-	-property @{"username"="$inputUserEmail";"labUserId"="$inputLabUserId";"Customer"="$inputCustomer";"SmartTicket"="$inputSmartTicket";"Environment"="$inputLabEnvironment"}
+		foreach ($workshopRecord in $workshopRecords) {
+			$instance = [int]$workshopRecord.RowKey.Split("-")[1]
+			$instances += $instance 
+		}
+		$sortedInstances = $instances | Sort-Object
+		$nextInstance = $sortedInstances[$sortedInstances.Count - 1] + 1
+	}
+	$nextInstance
+
+	Add-AzTableRow -table $storageTable.CloudTable -partitionKey "workshops" -rowKey ($inputLabName + "-" + $nextInstance) `
+		-property @{"username" = "$inputUserEmail"; "labUserId" = "$inputLabUserId"; "Customer" = "$inputCustomer"; "SmartTicket" = "$inputSmartTicket"; "Environment" = "$inputLabEnvironment" }
 }
 
 ### Main ###
@@ -242,8 +242,8 @@ if ($WebhookData) {
 		$UserName = $jsonBody.username
 		$OdlConfigName = $jsonBody.odlconfigname
 		$UserEmail = $jsonBody.email
-    $SmartTicket = $jsonBody.smartTicket
-    $Customer = $jsonBody.customer
+		$SmartTicket = $jsonBody.smartTicket
+		$Customer = $jsonBody.customer
 	}
 	else {
 
@@ -294,8 +294,8 @@ $odlConfig = Get-OdlConfig ($odlConfigUri + $OdlConfigName + ".json")
 if ($odlConfig.fortiLabEnv -eq "Azure") {
 
 	# Azure Environment
-  # Get the range of available user ID numbers
-	$userIdNumberRange  = $($odlConfig.userIdNumberRange.Split(":")[0])..($odlConfig.userIdNumberRange.Split(":")[1])
+	# Get the range of available user ID numbers
+	$userIdNumberRange = $($odlConfig.userIdNumberRange.Split(":")[0])..($odlConfig.userIdNumberRange.Split(":")[1])
 
 	Write-OutPut "Lab Environment: $($odlConfig.fortiLabEnv)"
 	Write-OutPut "Lab Name: $($odlConfig.fortiLabName)"
@@ -305,7 +305,8 @@ if ($odlConfig.fortiLabEnv -eq "Azure") {
 	Write-OutPut "Username prefix: $($odlConfig.userNamePrefix)"
 	Write-OutPut "User Tenant Domain: $($odlConfig.userTenantDomain)"
 	Write-OutPut "User Resource Groups: $($odlConfig.userResourceGroups)"
-} else {
+}
+else {
 
 	# Non Azure Environment
 	Write-OutPut "Lab Environment: $($odlConfig.fortiLabEnv)"
@@ -313,17 +314,22 @@ if ($odlConfig.fortiLabEnv -eq "Azure") {
 	Write-OutPut "Resrticted: $($odlConfig.fortiRestricted)"
 
 	Update-StorageTable "Internal_Training_Automation" `
-											"fortinetcloudinttraining" `
-											$odlConfig.fortiLabName `
-											$UserEmail `
-											"NA" `
-											$Customer `
-											$SmartTicket `
-											$odlConfig.fortiLabEnv
+		"fortinetcloudinttraining" `
+		$odlConfig.fortiLabName `
+		$UserEmail `
+		"NA" `
+		$Customer `
+		$SmartTicket `
+		$odlConfig.fortiLabEnv
 	exit
 }
+if ($UserEmail.StartsWith("test#")) {
+	$labDuration = 1
+} else {
+	$labDuration = $odlConfig.labDuration
+}
 
-$userResourceGroupTags = @{FortiLab = "$OdlConfigName"; Duration = "$($odlConfig.labDuration)" }
+$userResourceGroupTags = @{FortiLab = "$OdlConfigName"; Duration = "$($labDuration)" }
 if ($UserEmail) {
 	$userResourceGroupTags.add('Email', $UserEmail)
 }
@@ -336,57 +342,78 @@ if ($UserOp.Equals("Create")) {
 			Write-OutPut "$UserEmail is in a valid requestor domain"
 		}
 		else {
-				# Requestor is not a member of a valid domain
-				Write-OutPut "$UserEmail is not in a valid requestor domain"
-				exit
+			# Requestor is not a member of a valid domain
+			Write-OutPut "$UserEmail is not in a valid requestor domain"
+			exit
 		}
 	}
 	else {
 		# No restricted lab
 		Write-OutPut "Lab is not resrticted"
 	}
-	# Get available UserID #, combining an available ID number in the userIdNumberRange with userNamePrefix
-	$userNameIdNumber = Get-AvailableUserNameId $odlConfig.userNamePrefix $userIdNumberRange
 
-	# Create a user Login with the found available user ID Number and userNamePrefix
+	# Get the user tenant domain
 	$tenantDomain = Get-AzKeyVaultSecret `
 		-VaultName $vaultName `
 		-Name $odlConfig.userTenantDomain `
 		-AsPlainText -DefaultProfile $AzureContext
 
+	# Generate a password for the user account
+	$userPassword = Get-RandomPassword 12
+	Write-OutPut "User ID Password: $userPassword"
+
+	# Create the user account - multiple retries if needed due to Azure AD throttling
+	# and user ID already in use or not available or multiple simultaneous requests
+	# 
+	# Retrys is the number of allowed user accounts in the lab
+
+	$user = $null
+	$userCreationRetries = 0
+	While ($userCreationRetries -lt ($userIdNumberRange).Count) {
+		$userCreationRetries++
+		Write-OutPut "User Creation Attempt: $userCreationRetries"
+		$userNameIdNumber = Get-AvailableUserNameId $odlConfig.userNamePrefix $userIdNumberRange
+		if ($userNameIdNumber -gt 0) {
+			Start-Sleep -Seconds (($userIdNumberRange).Count % 2)
+			$userNameLogin = "$($odlConfig.userNamePrefix)$userNameIdNumber"
+			$userPrincipal = "$userNameLogin@$tenantDomain"
+	
+			$user = New-AzADUser `
+				-DisplayName  $userNameLogin `
+				-MailNickname  $userNameLogin `
+				-UserPrincipalName $userPrincipal `
+				-Password $(convertto-securestring -Force -AsPlainText $userPassword) `
+				-ErrorAction SilentlyContinue `
+			
+			if ($user) {
+				Write-OutPut "User ID created user: $user"
+				Write-OutPut "User ID available slot found: $userNameIdNumber"
+				Write-OutPut "User ID creating user: $userNameLogin"
+				Write-OutPut "User Principal: $userPrincipal"
+				$userResourceGroupTags.add('UserPrincipalName', $user.UserPrincipalName)
+				break
+			}
+			else {
+				Write-OutPut "User ID creation failed: $userNameIdNumber"
+				$userNameIdNumber = 0
+			}
+		}
+	}
+
 	if ($userNameIdNumber -gt 0) {
-		$userNameLogin = "$($odlConfig.userNamePrefix)$userNameIdNumber"
-		$userPrincipal = "$userNameLogin@$tenantDomain"
-
-		Write-OutPut "User ID available slot found: $userNameIdNumber"
-		Write-OutPut "User ID creating user: $userNameLogin"
-		Write-OutPut "User Principal: $userPrincipal"
-
-		$userPassword = Get-RandomPassword 12
-		Write-OutPut "User ID Password: $userPassword"
-
-		$user = New-AzADUser `
-			-DisplayName  $userNameLogin `
-			-MailNickname  $userNameLogin `
-			-UserPrincipalName $userPrincipal `
-			-Password $(convertto-securestring -Force -AsPlainText $userPassword) `
-			-ErrorAction Stop
-		
-		Write-OutPut "User ID created user: $user"
-
-		$userResourceGroupTags.add('UserPrincipalName', $user.UserPrincipalName)
-
 		if ($user) {
-
-      Update-StorageTable "Internal_Training_Automation" `
-													"fortinetcloudinttraining" `
-													$odlConfig.fortiLabName `
-													$UserEmail `
-													$user.UserPrincipalName `
-													$Customer `
-													$SmartTicket `
-													$odlConfig.fortiLabEnv
-
+			if ($UserEmail.StartsWith("test#")) {
+				$UserEmail = $UserEmail.Split("#")[1]
+			} else {
+				Update-StorageTable "Internal_Training_Automation" `
+					"fortinetcloudinttraining" `
+					$odlConfig.fortiLabName `
+					$UserEmail `
+					$user.UserPrincipalName `
+					$Customer `
+					$SmartTicket `
+					$odlConfig.fortiLabEnv
+			}
 			foreach ($userResourceGroup in $odlConfig.userResourceGroups) {
 				$resourceGroupname = "$($user.displayName)-$($userResourceGroup.suffix)"
 				$resourceGroupLocation = $userResourceGroup.location

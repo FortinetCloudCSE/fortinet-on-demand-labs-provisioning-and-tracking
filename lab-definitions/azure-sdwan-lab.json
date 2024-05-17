@@ -1,7 +1,7 @@
 {
   "fortiLabEnv": "Azure",
   "fortiLabName": "SDWAN",
-  "fortiRestricted": "1",
+  "fortiRestricted": ["fortinet.com", "fortinet-us.com"],
   "labDuration": "4",
   "userIdNumberRange": "10:40",
   "userNamePrefix": "se",

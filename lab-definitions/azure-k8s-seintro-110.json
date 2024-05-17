@@ -1,0 +1,18 @@
+{
+  "fortiLabEnv": "Azure",
+  "fortiLabName": "K8S110",
+  "fortiRestricted": ["fortinet.com", "fortinet-us.com"],
+  "labDuration": "3",
+  "userIdNumberRange": "50:90",
+  "userNamePrefix": "k8s",
+  "userTenantDomain": "tenant-01",
+  "userResourceGroups": [
+    {
+      "suffix": "k8s101-workshop",
+      "location": "eastus",
+      "storage": true,
+      "sharename": "cloudshellshare",
+      "bastion": false
+    }
+  ]
+}

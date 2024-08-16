@@ -1,0 +1,18 @@
+{
+	"fortiLabEnv": "Azure",
+	"fortiLabName": "AZUREFGT102",
+	"fortiRestricted": [],
+	"labDuration": "4",
+	"userIdNumberRange": "10:40",
+	"userNamePrefix": "fgt102az",
+	"userTenantDomain": "tenant-01",
+	"userResourceGroups": [
+		{
+			"suffix": "fgt-102-workshop",
+			"location": "eastus",
+			"storage": true,
+			"sharename": "cloudshellshare",
+			"bastion": false
+		}
+	]
+}
